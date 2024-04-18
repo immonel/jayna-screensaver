@@ -24,6 +24,7 @@
   onMount(() => {
     const image = document.querySelector('img') as HTMLImageElement;
     preloadImages();
+    window.addEventListener('resize', checkImageBounds);
 
     function preloadImages() {
       for (let src of imageSources) {
@@ -55,6 +56,21 @@
       image.width = width;
       image.height = height;
       animate(); // Start the animation loop
+    }
+
+    function checkImageBounds() {
+      if (x + width > window.innerWidth) {
+        x = window.innerWidth - width;
+      }
+      if (x < 0) {
+        x = 0;
+      }
+      if (y + height > window.innerHeight) {
+        y = window.innerHeight - height;
+      }
+      if (y < 0) {
+        y = 0;
+      }
     }
 
     function animate(): void {
