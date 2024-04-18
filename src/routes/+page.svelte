@@ -7,17 +7,17 @@
   let dy: number = 2;
   let width: number;
   let height: number;
-  let scaleFactor: number = 0.2;
+  let scaleFactor: number = 1;
   let speedFactor: number = 1;
   let imageIndex: number = 0; // Current image index
   let loadedImages: number = 0; // To track the number of images loaded
   let imagesReady: boolean = false; // Flag to check if all images are preloaded
   let animationFrameId: number; // To hold the requestAnimationFrame ID
   const imageSources: string[] = [
-    'jayna-red.png',
-    'jayna-blue.png',
-    'jayna-yellow.png',
-    'jayna-green.png'
+    'jayna-red.svg',
+    'jayna-blue.svg',
+    'jayna-yellow.svg',
+    'jayna-green.svg'
   ]; // Array of image sources
   const preloadedImages: HTMLImageElement[] = []; // Array to store preloaded image elements
 
