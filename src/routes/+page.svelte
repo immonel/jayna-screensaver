@@ -3,6 +3,7 @@
 
   let scaleFactor: number = 1;
   let speedFactor: number = 1;
+  let easingFactor: number = 0.1;
 
   let x: number = 0;
   let y: number = 0;
@@ -24,6 +25,10 @@
     'jayna-green.svg'
   ]; // Array of image sources
   const preloadedImages: HTMLImageElement[] = []; // Array to store preloaded image elements
+
+  function lerp(current: number, target: number, factor: number): number {
+    return current + (target - current) * factor;
+  }
 
   onMount(() => {
     const image = document.querySelector('img') as HTMLImageElement;
@@ -91,15 +96,27 @@
       }
     }
 
+    function willHitCorner(newX: number, newY: number): boolean {
+      return newX <= 0 && newY <= 0 || newX >= window.innerWidth - width && newY >= window.innerHeight - height;
+    }
+
     function animate(): void {
-        if (magnetismActive) {
-          // Calculate vector towards target corner
-          let vectorX = targetX - x;
-          let vectorY = targetY - y;
-          let distance = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
-          dx = (vectorX / distance) * 4; // Speed adjustment for attraction
-          dy = (vectorY / distance) * 4;
-          toggleMagnetism();
+         if (magnetismActive) {
+          let newX = x + dx * speedFactor;
+          let newY = y + dy * speedFactor;
+
+          if (willHitCorner(newX, newY)) {
+            magnetismActive = false;  // Turn off magnetism if the image is heading to the corner
+          } else {
+            let vectorX = targetX - x;
+            let vectorY = targetY - y;
+            let distance = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+            let targetDx = (vectorX / distance) * 4;
+            let targetDy = (vectorY / distance) * 4;
+
+            dx = lerp(dx, targetDx, easingFactor); // Smoothing factor for dx
+            dy = lerp(dy, targetDy, easingFactor); // Smoothing factor for dy
+          }
         }
         let adjustedDx = dx * speedFactor;
         let adjustedDy = dy * speedFactor;
