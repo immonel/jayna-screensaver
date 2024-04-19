@@ -36,11 +36,36 @@
     window.addEventListener('resize', checkImageBounds);
     window.addEventListener('keydown', handleKeyDown);
 
+    function updateTargetToBestAlignedCorner() {
+      const corners = [
+        { x: 0, y: 0 },
+        { x: window.innerWidth - width, y: 0 },
+        { x: 0, y: window.innerHeight - height },
+        { x: window.innerWidth - width, y: window.innerHeight - height }
+      ];
+
+      let maxDotProduct = -Infinity;
+      const currentVectorNorm = Math.sqrt(dx * dx + dy * dy);
+
+      corners.forEach(corner => {
+        const vectorX = corner.x - x;
+        const vectorY = corner.y - y;
+        const cornerVectorNorm = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+        const dotProduct = (dx / currentVectorNorm) * (vectorX / cornerVectorNorm) + (dy / currentVectorNorm) * (vectorY / cornerVectorNorm);
+
+        if (dotProduct > maxDotProduct) {
+          maxDotProduct = dotProduct;
+          targetX = corner.x;
+          targetY = corner.y;
+        }
+      });
+    }
+
     function toggleMagnetism() {
       magnetismActive = !magnetismActive;
-      // Choose the corner for magnetism, here it's the top-left corner
-      targetX = window.innerWidth - image.width;
-      targetY = window.innerHeight - image.height;
+      if (magnetismActive) {
+        updateTargetToBestAlignedCorner();
+      }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -97,7 +122,12 @@
     }
 
     function willHitCorner(newX: number, newY: number): boolean {
-      return newX <= 0 && newY <= 0 || newX >= window.innerWidth - width && newY >= window.innerHeight - height;
+      return (
+        newX <= 0 && newY <= 0 ||
+        newX >= window.innerWidth - width && newY >= window.innerHeight - height ||
+        newX >= window.innerWidth - width && newY <= 0 ||
+        newX <= 0 && newY >= window.innerHeight - height
+      );
     }
 
     function animate(): void {
@@ -111,8 +141,8 @@
             let vectorX = targetX - x;
             let vectorY = targetY - y;
             let distance = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
-            let targetDx = (vectorX / distance) * 4;
-            let targetDy = (vectorY / distance) * 4;
+            let targetDx = (vectorX / distance) * 3;
+            let targetDy = (vectorY / distance) * 3;
 
             dx = lerp(dx, targetDx, easingFactor); // Smoothing factor for dx
             dy = lerp(dy, targetDy, easingFactor); // Smoothing factor for dy
