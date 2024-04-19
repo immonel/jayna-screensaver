@@ -1,14 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  let scaleFactor: number = 1;
+  let speedFactor: number = 1;
+
   let x: number = 0;
   let y: number = 0;
   let dx: number = 2;
   let dy: number = 2;
   let width: number;
   let height: number;
-  let scaleFactor: number = 1;
-  let speedFactor: number = 1;
+  let targetX: number = 0; // X-coordinate of the magnetic corner
+  let targetY: number = 0; // Y-coordinate of the magnetic corner
+  let magnetismActive: boolean = false;
   let imageIndex: number = 0; // Current image index
   let loadedImages: number = 0; // To track the number of images loaded
   let imagesReady: boolean = false; // Flag to check if all images are preloaded
@@ -25,6 +29,20 @@
     const image = document.querySelector('img') as HTMLImageElement;
     preloadImages();
     window.addEventListener('resize', checkImageBounds);
+    window.addEventListener('keydown', handleKeyDown);
+
+    function toggleMagnetism() {
+      magnetismActive = !magnetismActive;
+      // Choose the corner for magnetism, here it's the top-left corner
+      targetX = window.innerWidth - image.width;
+      targetY = window.innerHeight - image.height;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === ' ') {
+        toggleMagnetism();
+      }
+    }
 
     function preloadImages() {
       for (let src of imageSources) {
@@ -74,6 +92,15 @@
     }
 
     function animate(): void {
+        if (magnetismActive) {
+          // Calculate vector towards target corner
+          let vectorX = targetX - x;
+          let vectorY = targetY - y;
+          let distance = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+          dx = (vectorX / distance) * 4; // Speed adjustment for attraction
+          dy = (vectorY / distance) * 4;
+          toggleMagnetism();
+        }
         let adjustedDx = dx * speedFactor;
         let adjustedDy = dy * speedFactor;
 
