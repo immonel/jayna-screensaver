@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '$lib/checkered.css';
+  import '$lib/background.css';
 </script>
 
 <slot />

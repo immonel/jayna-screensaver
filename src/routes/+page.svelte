@@ -19,9 +19,8 @@
   let imagesReady: boolean = false; // Flag to check if all images are preloaded
   let animationFrameId: number; // To hold the requestAnimationFrame ID
   const imageSources: string[] = [
-    'jayna-red.svg',
-    'jayna-blue.svg',
-    'jayna-yellow.svg',
+    'jayna-pink.svg',
+    'jayna-pinkgreen.svg',
     'jayna-green.svg'
   ]; // Array of image sources
   const preloadedImages: HTMLImageElement[] = []; // Array to store preloaded image elements
